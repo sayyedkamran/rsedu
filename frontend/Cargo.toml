@@ -1,6 +1,29 @@
 [package]
-name = "frontend"
-version = "0.1.0"
-edition = "2024"
+name = "rsedu-frontend"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
 
 [dependencies]
+# Leptos framework
+leptos = { version = "0.8.14", features = ["csr"] }
+leptos_router = "0.8.10"
+leptos_meta = "0.8.5"
+wasm-bindgen-futures = "0.4"
+
+# HTTP client for calling backend
+gloo-net = { version = "0.6.0", features = ["http"] }
+wasm-bindgen = "0.2.106"
+
+# Serialization (same as backend)
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+# Web APIs
+web-sys = "0.3.83"
+console_error_panic_hook = "0.1.7"
+console_log = "1.0"
+log = "0.4.29"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.56"
