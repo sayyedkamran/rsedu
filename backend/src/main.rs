@@ -6,6 +6,7 @@ use axum::{
 use serde::Serialize;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
+use tower_http::cors::{CorsLayer, Any};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod api;
@@ -45,6 +46,12 @@ async fn main() {
     .route("/health", get(health_check))
     .route("/test", get(|| async { "Test works!" }))  // Simple test
     .nest("/api/v1", api_routes)
+    .layer(
+        CorsLayer::new()
+            .allow_origin(Any)
+            .allow_methods(Any)
+            .allow_headers(Any)
+    )
     .layer(TraceLayer::new_for_http());
 
     // Start the server

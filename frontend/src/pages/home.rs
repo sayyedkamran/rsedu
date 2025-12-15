@@ -32,7 +32,7 @@ pub fn Home() -> impl IntoView {
             set_health_loading.set(true);
             set_health_error.set(None);
 
-            let result = Request::get("http://localhost:8080/health")
+            let result = Request::get("http://localhost:3000/health")
                 .send()
                 .await;
 
@@ -62,7 +62,7 @@ pub fn Home() -> impl IntoView {
             set_api_loading.set(true);
             set_api_error.set(None);
 
-            let result = Request::get("http://localhost:8080/api/v1/info")
+            let result = Request::get("http://localhost:3000/api/v1/info")
                 .send()
                 .await;
 
