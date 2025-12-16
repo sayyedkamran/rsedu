@@ -15,6 +15,7 @@ struct ApiInfo {
     name: String,
     version: String,
     description: String,
+    database_connected: bool,
 }
 
 #[component]
@@ -194,6 +195,10 @@ pub fn Home() -> impl IntoView {
                                         <strong>{"Description".to_string()}</strong>
                                         <span>{info.description}</span>
                                     </div>
+                                    <div class="info-item">
+                                        <strong>{"Database".to_string()}</strong>
+                                        <span>{if info.database_connected { "✅ Connected".to_string() } else { "❌ Disconnected".to_string() }}</span>
+                                    </div>
                                 </div>
                             </div>
                         }.into_view()
@@ -213,6 +218,10 @@ pub fn Home() -> impl IntoView {
                                         <strong>{String::new()}</strong>
                                         <span>{String::new()}</span>
                                     </div>
+                                    <div class="info-item">
+                                        <strong>{String::new()}</strong>
+                                        <span>{String::new()}</span>
+                                    </div>
                                 </div>
                             </div>
                         }.into_view()
@@ -223,6 +232,10 @@ pub fn Home() -> impl IntoView {
                                     <div class="info-item">
                                         <strong>{"Info".to_string()}</strong>
                                         <span>{"Click the button to fetch API information".to_string()}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <strong>{String::new()}</strong>
+                                        <span>{String::new()}</span>
                                     </div>
                                     <div class="info-item">
                                         <strong>{String::new()}</strong>

@@ -11,6 +11,8 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 mod api;
 mod config;
+mod database;
+mod entitie;
 
 #[derive(Serialize)]
 struct HealthResponse {
@@ -40,12 +42,20 @@ async fn main() {
     tracing::info!("🚀 Starting rsEdu Backend");
     tracing::info!("📚 Environment: {}", config.environment);
 
+    // Connect to database
+    let db = database::establish_connection(&config.database_url)
+    .await
+    .expect("Failed to connect to database");
+
+    tracing::info!("📊 Database connected");
+
     // Build our API routes
     let api_routes = api::routes();  // Get the router from api module
+
     let app = Router::new()
     .route("/health", get(health_check))
-    .route("/test", get(|| async { "Test works!" }))  // Simple test
-    .nest("/api/v1", api_routes)
+    .nest("/api/v1", api::routes())
+    .with_state(db)  // ← At the end
     .layer(
         CorsLayer::new()
             .allow_origin(Any)
