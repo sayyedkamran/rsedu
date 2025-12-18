@@ -12,7 +12,9 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 mod api;
 mod config;
 mod database;
-mod entitie;
+mod dto;
+mod entities;
+mod repositories;
 
 #[derive(Serialize)]
 struct HealthResponse {
@@ -50,8 +52,6 @@ async fn main() {
     tracing::info!("📊 Database connected");
 
     // Build our API routes
-    let api_routes = api::routes();  // Get the router from api module
-
     let app = Router::new()
     .route("/health", get(health_check))
     .nest("/api/v1", api::routes())

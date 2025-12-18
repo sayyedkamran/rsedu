@@ -18,6 +18,22 @@ struct ApiInfo {
     database_connected: bool,
 }
 
+#[derive(Debug, Clone, Deserialize)]
+struct User {
+    id: i32,
+    email: String,
+    full_name: String,
+    role: String,
+    is_active: bool,
+    created_at: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+struct UsersListResponse {
+    users: Vec<User>,
+    total: usize,
+}
+
 #[component]
 pub fn Home() -> impl IntoView {
     let (health_status, set_health_status) = create_signal(None::<HealthResponse>);
@@ -27,6 +43,10 @@ pub fn Home() -> impl IntoView {
     let (api_info, set_api_info) = create_signal(None::<ApiInfo>);
     let (api_loading, set_api_loading) = create_signal(false);
     let (api_error, set_api_error) = create_signal(None::<String>);
+
+    let (users_list, set_users_list) = create_signal(None::<UsersListResponse>);
+    let (users_loading, set_users_loading) = create_signal(false);
+    let (users_error, set_users_error) = create_signal(None::<String>);
 
     let check_health = move || {
         spawn_local(async move {
@@ -83,6 +103,36 @@ pub fn Home() -> impl IntoView {
                 Err(e) => {
                     set_api_error.set(Some(format!("Failed to connect: {}", e)));
                     set_api_loading.set(false);
+                }
+            }
+        });
+    };
+
+    let fetch_users = move || {
+        spawn_local(async move {
+            set_users_loading.set(true);
+            set_users_error.set(None);
+
+            let result = Request::get("http://localhost:3000/api/v1/users")
+                .send()
+                .await;
+
+            match result {
+                Ok(response) => {
+                    match response.json::<UsersListResponse>().await {
+                        Ok(data) => {
+                            set_users_list.set(Some(data));
+                            set_users_loading.set(false);
+                        }
+                        Err(e) => {
+                            set_users_error.set(Some(format!("Failed to parse: {}", e)));
+                            set_users_loading.set(false);
+                        }
+                    }
+                }
+                Err(e) => {
+                    set_users_error.set(Some(format!("Failed to connect: {}", e)));
+                    set_users_loading.set(false);
                 }
             }
         });
@@ -250,6 +300,64 @@ pub fn Home() -> impl IntoView {
                         }.into_view()
                     }
                 }}
+            </div>
+
+            <div class="card">
+                <h2>"👥 Users List"</h2>
+                <button 
+                    on:click=move |_| fetch_users()
+                    disabled=move || users_loading.get()
+                >
+                    {move || if users_loading.get() { 
+                        "⏳ Loading Users..." 
+                    } else { 
+                        "Load Users" 
+                    }}
+                </button>
+                {move || {
+                    let (status_class, message, users_views): (_, _, Vec<_>) = if let Some(response) = users_list.get() {
+                        let total_text = format!("Total Users: {}", response.total);
+                        let views: Vec<_> = response.users.iter().map(|user| {
+                            let role_badge = match user.role.as_str() {
+                                "admin" => "badge-admin",
+                                "teacher" => "badge-teacher",
+                                _ => "badge-student",
+                            };
+                            
+                            view! {
+                                <div class="user-card">
+                                    <div class="user-header">
+                                        <h3>{user.full_name.clone()}</h3>
+                                        <span class={format!("badge {}", role_badge)}>{user.role.clone()}</span>
+                                    </div>
+                                    <p class="user-email">{user.email.clone()}</p>
+                                    <p class="user-meta">
+                                        {"ID: "}{user.id.to_string()}{" • "}
+                                        {if user.is_active { "✅ Active" } else { "❌ Inactive" }}
+                                    </p>
+                                    <p class="user-date">{"Created: "}{user.created_at.clone()}</p>
+                                </div>
+                            }
+                        }).collect();
+                        ("success", total_text, views)
+                    } else if let Some(err) = users_error.get() {
+                        let error_text = format!("Error: {}", err);
+                        ("error", error_text, Vec::new())
+                    } else {
+                        let info_text = format!("Click the button to load users from database");
+                        ("", info_text, Vec::new())
+                    };
+                    
+                    view! {
+                        <div class={format!("status {}", status_class)}>
+                            <p><strong>{message}</strong></p>
+                            <div class="users-grid">
+                                {users_views}
+                            </div>
+                        </div>
+                    }.into_view()
+                }}
+            
             </div>
         </div>
     }

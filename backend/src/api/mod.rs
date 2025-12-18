@@ -2,6 +2,8 @@ use axum::{routing::get, Router, Json, extract::State};
 use sea_orm::DatabaseConnection;
 use serde::Serialize;
 
+mod users;
+
 #[derive(Serialize)]
 struct ApiInfo {
     name: String,
@@ -26,4 +28,6 @@ pub fn routes() -> Router<DatabaseConnection> {
     tracing::info!("📋 Registering API routes");
     Router::new()
         .route("/info", get(api_info))
+        .route("/users", get(users::list_users).post(users::create_user))
+        .route("/users/{id}", get(users::get_user).delete(users::delete_user))
 }
