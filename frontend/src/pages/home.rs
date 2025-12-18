@@ -36,17 +36,17 @@ struct UsersListResponse {
 
 #[component]
 pub fn Home() -> impl IntoView {
-    let (health_status, set_health_status) = create_signal(None::<HealthResponse>);
-    let (health_loading, set_health_loading) = create_signal(false);
-    let (health_error, set_health_error) = create_signal(None::<String>);
+    let (health_status, set_health_status) = signal(None::<HealthResponse>);
+    let (health_loading, set_health_loading) = signal(false);
+    let (health_error, set_health_error) = signal(None::<String>);
 
-    let (api_info, set_api_info) = create_signal(None::<ApiInfo>);
-    let (api_loading, set_api_loading) = create_signal(false);
-    let (api_error, set_api_error) = create_signal(None::<String>);
+    let (api_info, set_api_info) = signal(None::<ApiInfo>);
+    let (api_loading, set_api_loading) = signal(false);
+    let (api_error, set_api_error) = signal(None::<String>);
 
-    let (users_list, set_users_list) = create_signal(None::<UsersListResponse>);
-    let (users_loading, set_users_loading) = create_signal(false);
-    let (users_error, set_users_error) = create_signal(None::<String>);
+    let (users_list, set_users_list) = signal(None::<UsersListResponse>);
+    let (users_loading, set_users_loading) = signal(false);
+    let (users_error, set_users_error) = signal(None::<String>);
 
     let check_health = move || {
         spawn_local(async move {

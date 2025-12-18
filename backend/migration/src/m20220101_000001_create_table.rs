@@ -1,14 +1,13 @@
 use sea_orm_migration::{prelude::*, schema::*};
 
 #[derive(DeriveMigrationName)]
+#[allow(dead_code)]
 pub struct Migration;
 
 #[async_trait::async_trait]
 impl MigrationTrait for Migration {
     async fn up(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
             .create_table(
                 Table::create()
@@ -24,8 +23,6 @@ impl MigrationTrait for Migration {
 
     async fn down(&self, manager: &SchemaManager) -> Result<(), DbErr> {
         // Replace the sample below with your own migration scripts
-        todo!();
-
         manager
             .drop_table(Table::drop().table(Post::Table).to_owned())
             .await
@@ -33,6 +30,7 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(DeriveIden)]
+#[allow(dead_code)]
 enum Post {
     Table,
     Id,
